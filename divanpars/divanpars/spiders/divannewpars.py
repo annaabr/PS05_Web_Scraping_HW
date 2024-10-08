@@ -1,25 +1,27 @@
 import scrapy
-import csv
+
 
 class DivannewparsSpider(scrapy.Spider):
-    name = "divannewpars"
-    allowed_domains = ["divan.ru"]
-    start_urls = ["https://www.divan.ru/rostov-na-donu/category/svet"]
+   name = "divannewpars"
+   allowed_domains = ["https://divan.ru"]
+   start_urls = ["https://www.divan.ru/category/divany-i-kresla"]
 
-    # Инициализация списка для хранения данных
-    # Инициализация списка для хранения данных
-    custom_settings = {
-        'FEED_FORMAT': 'csv',
-        'FEED_URI': 'lamps.csv',
-        'FEED_EXPORT_ENCODING': 'utf-8'  # Установка кодировки UTF-8
-    }
 
-    def parse(self, response):
-        lamps = response.css('div._Ud0k')
-        for lamp in lamps:
-            yield {
-                'name': lamp.css('div.lsooF span::text').get(),
-                'price': lamp.css('div.pY3d2 span::text').get(),
-                'url': lamp.css('a').attrib['href']
-            }
-
+   def parse(self, response):
+   # Создаём переменную, в которую будет сохраняться информация
+       divans = response.css('div._Ud0k')
+       # Настраиваем работу с каждым отдельным диваном в списке
+       for divan in divans:
+           # Используем новый для нас оператор "yield", который помогает обрабатывать одно отдельное действие
+           # С его помощью мы можем управлять потоком выполнения, останавливать и возобновлять работу парсера
+           # С другими операторами мы такого делать не можем
+           yield {
+           # Ссылки и теги получаем с помощью консоли на сайте 
+           # Создаём словарик названий, используем поиск по диву, а внутри дива — по тегу span
+           'name' : divan.css('div.lsooF span::text').get(),
+           # Создаём словарик цен, используем поиск по диву, а внутри дива — по тегу span
+           'price' : divan.css('div.pY3d2 span::text').get(),
+           # Создаём словарик ссылок, используем поиск по тегу "a", а внутри тега — по атрибуту
+           # Атрибуты — это настройки тегов
+           'url' : divan.css('a').attrib['href']
+           }
